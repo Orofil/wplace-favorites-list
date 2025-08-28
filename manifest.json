@@ -1,0 +1,25 @@
+{
+  "manifest_version": 2,
+  "name": "Wplace Favorites List",
+  "version": "1.0",
+  "description": "Save a list of your favorite places in Wplace.",
+  "icons": {
+    "48": "icon.png"
+  },
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://wplace.live/*"],
+      "js": ["main.js"]
+    }
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "@wplace-favs.orofil",
+      "strict_min_version": "50.0"
+    }
+  }
+}
