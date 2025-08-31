@@ -84,7 +84,7 @@ function createListButton() {
 
   if (container.querySelector(".favs-list-btn")) return;
 
-  const btn = createButton("Favs", showFavsModal);
+  const btn = createButton("⭐", showFavsModal);
   btn.classList.add("favs-list-btn");
   btn.classList.add("indicator");
   btn.classList.add("btn");
@@ -125,11 +125,24 @@ async function initFavsModal() {
   close.classList.add("right-2");
   close.classList.add("top-2");
   closeForm.appendChild(close);
+
+  const headerContainer = document.createElement("div");
+  headerContainer.classList.add("modal-header");
+
+  const header = document.createElement("h3");
+  header.innerText = "⭐ Favorite locations";
+  header.classList.add("flex");
+  header.classList.add("items-center");
+  header.classList.add("gap-1.5");
+  header.classList.add("text-xl");
+  header.classList.add("font-bold");
+  headerContainer.appendChild(header);
   
   const list = document.createElement("ul");
   list.id = "favs-list";
   
   modalBox.appendChild(closeForm);
+  modalBox.appendChild(headerContainer);
   modalBox.appendChild(list);
   
   modal.appendChild(modalBox);
@@ -149,15 +162,38 @@ async function showFavsModal() {
   const list = document.querySelector("#favs-list");
   if (!list) return;
   list.innerHTML = "";
+
   savedTexts.forEach((txt) => {
     const li = document.createElement("li");
+    li.addEventListener("click", () => {
+      window.open(txt, "_self");
+    });
+
     const a = document.createElement("a");
     a.href = txt;
     a.textContent = txt;
     a.target = "_self";
-    a.style.display = "block";
-    a.style.margin = "5px 0";
+
+    // Delete button
+    const trash = document.createElement("button");
+    trash.textContent = "🗑️";
+    trash.className = "delete-btn";
+    trash.title = "Remove favorite";
+
+    trash.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Remove from storage
+      const { savedTexts = [] } = await browser.storage.sync.get("savedTexts");
+      const updated = savedTexts.filter((t) => t !== txt);
+      await browser.storage.sync.set({ savedTexts: updated });
+
+      li.remove();
+    });
+
     li.appendChild(a);
+    li.appendChild(trash);
     list.appendChild(li);
   });
 }

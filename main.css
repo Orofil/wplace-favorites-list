@@ -1,0 +1,62 @@
+:root {
+  --accent-color: #adb4d1;
+  --hover-color: #e8eefa;
+  --hover-color-darker: #d9e1f1;
+}
+
+.modal-box {
+  max-width: 40em;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--accent-color);
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+#favs-list li {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 14px;
+  transition: background 0.2s;
+  margin: 0.2em 0;
+  padding: 0.3em;
+  min-height: 3em;
+}
+
+#favs-list li:hover {
+  background: var(--hover-color);
+}
+
+#favs-list a {
+  word-break: break-word;
+  max-width: 90%;
+}
+
+#favs-list a:hover {
+  color: rgb(54, 74, 185);
+}
+
+#favs-list li button.delete-btn {
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 10px;
+  transition: background 0.2s;
+  padding: 0.6em;
+  margin-left: 8px;
+  display: none;
+}
+
+#favs-list li:hover button.delete-btn {
+  display: inline; /* Only visible on hover */
+}
+
+#favs-list li button.delete-btn:hover {
+  background: var(--hover-color-darker);
+}
