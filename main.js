@@ -124,6 +124,7 @@ async function initFavsModal() {
   close.classList.add("absolute");
   close.classList.add("right-2");
   close.classList.add("top-2");
+  close.style.zIndex = 2;
   closeForm.appendChild(close);
 
   const headerContainer = document.createElement("div");
