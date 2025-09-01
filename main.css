@@ -4,6 +4,15 @@
   --hover-color-darker: #d9e1f1;
 }
 
+.share-save-wrapper {
+  margin-bottom: 1em;
+}
+
+.share-save-btn {
+  width: 160px;
+  margin-bottom: 10px;
+}
+
 .modal-box {
   max-width: 40em;
 }
@@ -15,6 +24,7 @@
   position: sticky;
   top: 0;
   z-index: 1;
+  background: #fff;
 }
 
 #favs-list li {
@@ -26,7 +36,7 @@
   transition: background 0.2s;
   margin: 0.2em 0;
   padding: 0.3em;
-  min-height: 3em;
+  padding-left: 1em;
 }
 
 #favs-list li:hover {
@@ -50,11 +60,16 @@
   transition: background 0.2s;
   padding: 0.6em;
   margin-left: 8px;
-  display: none;
+  visibility: hidden;
+  opacity: 0;
+  transition:
+    visibility 0.2s,
+    opacity 0.2s;
 }
 
 #favs-list li:hover button.delete-btn {
-  display: inline; /* Only visible on hover */
+  visibility: visible;
+  opacity: 1;
 }
 
 #favs-list li button.delete-btn:hover {
