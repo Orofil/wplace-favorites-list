@@ -45,7 +45,6 @@ function waitForShareButton() {
 }
 
 // Share button click
-// TODO add the name input
 async function createSaveButtonInModal() {
   const input = document.querySelector(
     "input.text-base-content\\/80.min-w-10.grow.text-sm.font-medium"
