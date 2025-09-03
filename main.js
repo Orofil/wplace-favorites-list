@@ -228,6 +228,7 @@ async function showFavsModal() {
 
   savedFavs.forEach((fav) => {
     const li = document.createElement("li");
+    // The entire list element is clickable
     li.addEventListener("click", () => {
       window.open(fav.url, "_self");
     });
@@ -237,15 +238,47 @@ async function showFavsModal() {
     a.textContent = fav.name;
     a.target = "_self";
 
-    // Delete button
-    const trash = document.createElement("button");
-    trash.textContent = "🗑️";
-    trash.className = "delete-btn";
-    trash.title = "Remove favorite";
+    const buttons = document.createElement("div");
+    buttons.className = "button-group";
 
-    trash.addEventListener("click", async (e) => {
+    // Edit button
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.className = "list-btn";
+    editBtn.title = "Edit name";
+
+    editBtn.addEventListener("click", async (e) => {
       e.preventDefault();
       e.stopPropagation();
+
+      let newName = prompt("Rename favorite to:", fav.name);
+      if (newName === null) return;
+      newName = newName.trim();
+      if (!newName) return;
+
+      // Update storage
+      const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+      const updated = savedFavs.map((f) =>
+        f.url === fav.url ? { ...f, name: newName } : f
+      );
+      await browser.storage.sync.set({ savedFavs: updated });
+
+      fav.name = newName;
+      a.textContent = newName;
+    });
+
+    // Delete button
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.className = "list-btn";
+    deleteBtn.title = "Remove favorite";
+
+    deleteBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      const confirmed = confirm("Delete favorite '" + fav.name + "'");
+      if (!confirmed) return;
 
       // Remove from storage
       const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
@@ -255,8 +288,10 @@ async function showFavsModal() {
       li.remove();
     });
 
+    buttons.appendChild(editBtn);
+    buttons.appendChild(deleteBtn);
     li.appendChild(a);
-    li.appendChild(trash);
+    li.appendChild(buttons);
     list.appendChild(li);
   });
 }

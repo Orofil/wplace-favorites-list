@@ -52,7 +52,12 @@
   color: rgb(54, 74, 185);
 }
 
-#favs-list li button.delete-btn {
+#favs-list .button-group {
+  display: flex;
+  flex-shrink: 0;
+}
+
+#favs-list button.list-btn {
   background: none;
   cursor: pointer;
   font-size: 14px;
@@ -67,11 +72,11 @@
     opacity 0.2s;
 }
 
-#favs-list li:hover button.delete-btn {
+#favs-list li:hover button.list-btn {
   visibility: visible;
   opacity: 1;
 }
 
-#favs-list li button.delete-btn:hover {
+#favs-list li button.list-btn:hover {
   background: var(--hover-color-darker);
 }
