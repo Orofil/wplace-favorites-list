@@ -1,7 +1,8 @@
 class SavedFav {
-  constructor(url, name) {
+  constructor(url, name, image = null) {
     this.url = url;
     this.name = name;
+    this.image = image; // Encoded in base64
   }
 }
 
@@ -73,7 +74,7 @@ async function createSaveButtonInModal() {
   if (oldHeader) oldHeader.remove();
 
   // Get storage
-  const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+  const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
 
   const header = document.createElement("h3");
   header.innerText = "⭐ Save to favorites";
@@ -112,13 +113,20 @@ async function createSaveButtonInModal() {
   saveWrapper.classList.add("h-10");
 
   const saveBtn = createButton("Save to Favorites", async () => {
-    const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+    const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
     if (!savedFavs.some((l) => l.url === urlText)) {
+      // Find the image for the fav
+      const imgElement = document.querySelector("img.border-base-content\\/20.border");
+      const imageBase64 = await getImageAsBase64(imgElement);
+      
       const favName = nameInput.value.trim() || cleanCoordinates(urlText); // Coordinates as default name
-      const newFav = new SavedFav(urlText, favName); 
+
+      const newFav = new SavedFav(urlText, favName, imageBase64);
       savedFavs.push(newFav);
-      await browser.storage.sync.set({ savedFavs });
+      await browser.storage.local.set({ savedFavs });
+
     }
+    saveBtn.innerText = "Saved";
     saveBtn.disabled = true;
   });
   saveBtn.classList.add("share-save-btn");
@@ -127,6 +135,7 @@ async function createSaveButtonInModal() {
   saveWrapper.appendChild(saveBtn);
 
   if (savedFavs.some((l) => l.url === urlText)) {
+    saveBtn.innerText = "Saved";
     saveBtn.disabled = true;
   }
 
@@ -221,7 +230,7 @@ async function showFavsModal() {
   }
 
   // Refresh list
-  const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+  const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
   const list = document.querySelector("#favs-list");
   if (!list) return;
   list.innerHTML = "";
@@ -233,13 +242,26 @@ async function showFavsModal() {
       window.open(fav.url, "_self");
     });
 
+    const leftContainer = document.createElement("div");
+    leftContainer.className = "left-group";
+
+    // Thumbnail
+    if (fav.image) {
+      const thumbnail = document.createElement("img");
+      thumbnail.src = fav.image;
+      thumbnail.alt = fav.name;
+      thumbnail.className = "list-thumbnail";
+      leftContainer.appendChild(thumbnail);
+    }
+
     const a = document.createElement("a");
     a.href = fav.url;
     a.textContent = fav.name;
     a.target = "_self";
+    leftContainer.appendChild(a);
 
-    const buttons = document.createElement("div");
-    buttons.className = "button-group";
+    const buttonContainer = document.createElement("div");
+    buttonContainer.className = "buttons-group";
 
     // Edit button
     const editBtn = document.createElement("button");
@@ -257,11 +279,11 @@ async function showFavsModal() {
       if (!newName) return;
 
       // Update storage
-      const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+      const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
       const updated = savedFavs.map((f) =>
         f.url === fav.url ? { ...f, name: newName } : f
       );
-      await browser.storage.sync.set({ savedFavs: updated });
+      await browser.storage.local.set({ savedFavs: updated });
 
       fav.name = newName;
       a.textContent = newName;
@@ -277,23 +299,59 @@ async function showFavsModal() {
       e.preventDefault();
       e.stopPropagation();
 
-      const confirmed = confirm("Delete favorite '" + fav.name + "'");
+      const confirmed = confirm("Delete favorite '" + fav.name + "'?");
       if (!confirmed) return;
 
       // Remove from storage
-      const { savedFavs = [] } = await browser.storage.sync.get("savedFavs");
+      const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
       const updated = savedFavs.filter((f) => f.url !== fav.url);
-      await browser.storage.sync.set({ savedFavs: updated });
+      await browser.storage.local.set({ savedFavs: updated });
 
       li.remove();
     });
 
-    buttons.appendChild(editBtn);
-    buttons.appendChild(deleteBtn);
-    li.appendChild(a);
-    li.appendChild(buttons);
+    buttonContainer.appendChild(editBtn);
+    buttonContainer.appendChild(deleteBtn);
+
+    li.appendChild(leftContainer);
+    li.appendChild(buttonContainer);
     list.appendChild(li);
   });
+}
+
+async function getImageAsBase64(imgElement, targetSize = 64) {
+  if (!imgElement || !imgElement.src) return null;
+  try {
+    // Image as Blob
+    const response = await fetch(imgElement.src);
+    const blob = await response.blob();
+
+    // Blob to HTMLImageElement
+    const bitmap = await createImageBitmap(blob);
+
+    // Crop area
+    const side = Math.min(bitmap.width, bitmap.height);
+    const cropX = (bitmap.width - side) / 2;
+    const cropY = (bitmap.height - side) / 2;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    canvas.width = targetSize;
+    canvas.height = targetSize;
+
+    // Crop and fit the image to the canvas size
+    ctx.drawImage(
+      bitmap,
+      cropX, cropY, side, side,
+      0, 0, targetSize, targetSize
+    );
+
+    // Convert the canvas back to Base64
+    return canvas.toDataURL("image/png");
+  } catch (err) {
+    console.error("Error resizing image:", err);
+    return null;
+  }
 }
 
 // Run setup

@@ -36,25 +36,38 @@
   transition: background 0.2s;
   margin: 0.2em 0;
   padding: 0.3em;
-  padding-left: 1em;
 }
 
 #favs-list li:hover {
   background: var(--hover-color);
 }
 
+#favs-list img.list-thumbnail {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
 #favs-list a {
   word-break: break-word;
-  max-width: 90%;
+  margin-left: 0.5em;
 }
 
 #favs-list a:hover {
   color: rgb(54, 74, 185);
 }
 
-#favs-list .button-group {
+#favs-list .left-group {
   display: flex;
-  flex-shrink: 0;
+  flex-grow: 2;
+  align-items: center;
+}
+
+#favs-list .buttons-group {
+  display: flex;
 }
 
 #favs-list button.list-btn {
@@ -64,7 +77,7 @@
   border-radius: 10px;
   transition: background 0.2s;
   padding: 0.6em;
-  margin-left: 8px;
+  margin-left: 5px;
   visibility: hidden;
   opacity: 0;
   transition:
