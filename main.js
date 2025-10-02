@@ -1,20 +1,25 @@
 class SavedFav {
-  constructor(url, name, image = null) {
+  constructor(url, name, image, coordLat, coordLon, pixelX, pixelY, areaCountry, areaName, areaNumber) {
     this.url = url;
     this.name = name;
     this.image = image; // Encoded in base64
+    this.coordLat = coordLat;
+    this.coordLon = coordLon;
+    this.pixelX = pixelX;
+    this.pixelY = pixelY;
+    this.areaCountry = areaCountry;
+    this.areaName = areaName;
+    this.areaNumber = areaNumber;
   }
 }
 
-// Get legible coordinates from a URL
-function cleanCoordinates(urlText) {
+function getCoordinates(urlText) {
   const url = new URL(urlText);
   const params = new URLSearchParams(url.search);
   
-  const lat = Math.round(parseFloat(params.get("lat")) * 1_000_000) / 1_000_000.0;
-  const lng = Math.round(parseFloat(params.get("lng")) * 1_000_000) / 1_000_000.0;
-  const coords = lat + ", " + lng;
-  return coords;
+  const lat = params.get("lat");
+  const lng = params.get("lng");
+  return [lat, lng];
 }
 
 function createButton(label, onClick) {
@@ -24,13 +29,10 @@ function createButton(label, onClick) {
   return btn;
 }
 
-// Get share button
-const shareContainerSelector =
-  "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pb-2.pt-3.sm\\:pb-3";
-
 // Find share button and add onClick
 function waitForShareButton() {
-  const container = document.querySelector(shareContainerSelector);
+  const container = document.querySelector(
+    "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pb-2.pt-3.sm\\:pb-3");
   if (!container) return;
 
   const shareBtn = [...container.querySelectorAll("button")].find((btn) =>
@@ -115,16 +117,28 @@ async function createSaveButtonInModal() {
   const saveBtn = createButton("Save to Favorites", async () => {
     const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
     if (!savedFavs.some((l) => l.url === urlText)) {
+      const favName = nameInput.value.trim();
+
       // Find the image for the fav
       const imgElement = document.querySelector("img.border-base-content\\/20.border");
       const imageBase64 = await getImageAsBase64(imgElement);
-      
-      const favName = nameInput.value.trim() || cleanCoordinates(urlText); // Coordinates as default name
 
-      const newFav = new SavedFav(urlText, favName, imageBase64);
+      const [coordLat, coordLon] = getCoordinates(urlText);
+
+      const infoContainer = document.querySelector(
+        "div.rounded-t-box.bg-base-100.border-base-300.sm\\:rounded-b-box.w-full.border-t.pt-2.sm\\:mb-3.sm\\:shadow-xl");
+      const pixelSpan = infoContainer.querySelector("span.whitespace-nowrap");
+      const pixelText = pixelSpan.innerText;
+      const pixelX = pixelText.substring(pixelText.indexOf(":")+2, pixelText.indexOf(","));
+      const pixelY = pixelText.substring(pixelText.indexOf(",")+2);
+
+      const areaContainer = infoContainer.querySelector("button.btn.btn-xs.flex.gap-1.py-3.text-sm.max-sm\\:max-w-32");
+      const [areaCountry, areaName, areaNumber] = Array.from(areaContainer.querySelectorAll("span"))
+        .map(span => span.textContent.trim());
+
+      const newFav = new SavedFav(urlText, favName, imageBase64, coordLat, coordLon, pixelX, pixelY, areaCountry, areaName, areaNumber);
       savedFavs.push(newFav);
       await browser.storage.local.set({ savedFavs });
-
     }
     saveBtn.innerText = "Saved";
     saveBtn.disabled = true;
@@ -254,11 +268,58 @@ async function showFavsModal() {
       leftContainer.appendChild(thumbnail);
     }
 
+    const infoContainer = document.createElement("div");
+    infoContainer.className = "info-container";
+
     const a = document.createElement("a");
     a.href = fav.url;
     a.textContent = fav.name;
     a.target = "_self";
-    leftContainer.appendChild(a);
+    infoContainer.appendChild(a);
+
+    const locationInfoContainer = document.createElement("div");
+    locationInfoContainer.className = "location-info";
+
+    const locationTextInfoContainer = document.createElement("div");
+    locationTextInfoContainer.className = "location-text";
+
+    // Coordinates
+    const coordSpan = document.createElement("span");
+    coordSpan.classList.add("small-info-text");
+    coordSpan.textContent = fav.coordLat + ", " + fav.coordLon;
+    locationTextInfoContainer.appendChild(coordSpan);
+
+    // Pixel
+    const pixelSpan = document.createElement("span");
+    pixelSpan.classList.add("small-info-text");
+    pixelSpan.textContent = "Pixel: " + fav.pixelX + ", " + fav.pixelY;
+    locationTextInfoContainer.appendChild(pixelSpan);
+
+    // Area
+    const areaBtn = document.createElement("button");
+    areaBtn.className = "btn btn-xs flex gap-1 py-3 text-sm max-sm:max-w-32 text-blue-600";
+    
+    const countrySpan = document.createElement("span");
+    countrySpan.className = "font-flag tooltip";
+    countrySpan.textContent = fav.areaCountry;
+    
+    const nameSpan = document.createElement("span");
+    nameSpan.className = "line-clamp-1 text-ellipsis";
+    nameSpan.textContent = fav.areaName;
+    
+    const numberSpan = document.createElement("span");
+    numberSpan.textContent = fav.areaNumber;
+    
+    areaBtn.appendChild(countrySpan);
+    areaBtn.appendChild(nameSpan);
+    areaBtn.appendChild(numberSpan);
+
+    locationInfoContainer.appendChild(areaBtn);
+    locationInfoContainer.appendChild(locationTextInfoContainer);
+
+    infoContainer.appendChild(locationInfoContainer);
+    leftContainer.appendChild(infoContainer);
+
 
     const buttonContainer = document.createElement("div");
     buttonContainer.className = "buttons-group";

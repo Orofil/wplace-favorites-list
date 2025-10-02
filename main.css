@@ -51,9 +51,32 @@
   border-radius: 10px;
 }
 
+#favs-list .info-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 1em;
+}
+
+#favs-list .location-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5em;
+}
+
+#favs-list .location-text {
+  display: flex;
+  flex-direction: column;
+}
+
+#favs-list .small-info-text {
+  /* font-style: italic; */
+  font-size: 10px;
+  color: rgb(128, 128, 128);
+}
+
 #favs-list a {
   word-break: break-word;
-  margin-left: 0.5em;
 }
 
 #favs-list a:hover {
