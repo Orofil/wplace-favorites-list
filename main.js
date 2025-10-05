@@ -223,6 +223,8 @@ async function initFavsModal() {
   header.classList.add("text-xl");
   header.classList.add("font-bold");
   headerContainer.appendChild(header);
+
+  createBackupButton(headerContainer);
   
   const list = document.createElement("ul");
   list.id = "favs-list";
@@ -413,6 +415,33 @@ async function getImageAsBase64(imgElement, targetSize = 64) {
     console.error("Error resizing image:", err);
     return null;
   }
+}
+
+function createBackupButton(container) {
+  const backupBtn = document.createElement("button");
+  backupBtn.textContent = "Backup";
+  backupBtn.classList.add("btn");
+
+  backupBtn.addEventListener("click", async () => {
+    const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
+    if (savedFavs.length === 0) {
+      alert("No favorites to back up.");
+      return;
+    }
+
+    const data = JSON.stringify(savedFavs, null, 2);
+    const now = new Date();
+    const timestamp = now.toISOString()
+      .replace(/T/, "_")
+      .replace(/:/g, "-")
+      .replace(/\..+/, ""); // Remove milliseconds
+    const filename = `wplace-favorites_${timestamp}.json`;
+
+    // Download using background script
+    browser.runtime.sendMessage({ action: "backup", data, filename });
+  });
+
+  container.appendChild(backupBtn);
 }
 
 // Run setup

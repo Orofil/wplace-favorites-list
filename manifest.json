@@ -8,7 +8,8 @@
   },
   "permissions": [
     "storage",
-    "scripting"
+    "scripting",
+    "downloads"
   ],
   "content_scripts": [
     {
@@ -17,6 +18,11 @@
       "css": ["main.css"]
     }
   ],
+  "background": {
+    "scripts": ["backup.js"],
+    "persistent": false,
+    "type": "module"
+  },
   "browser_specific_settings": {
     "gecko": {
       "id": "@wplace-favs.orofil",
