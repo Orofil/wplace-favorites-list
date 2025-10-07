@@ -224,7 +224,13 @@ async function initFavsModal() {
   header.classList.add("font-bold");
   headerContainer.appendChild(header);
 
-  createBackupButton(headerContainer);
+  const backupButtonsContainer = document.createElement("div");
+  backupButtonsContainer.classList.add("backup-buttons");
+
+  createBackupButton(backupButtonsContainer);
+  createImportButton(backupButtonsContainer);
+
+  headerContainer.appendChild(backupButtonsContainer);
   
   const list = document.createElement("ul");
   list.id = "favs-list";
@@ -442,6 +448,62 @@ function createBackupButton(container) {
   });
 
   container.appendChild(backupBtn);
+}
+
+function createImportButton(container) {
+  const importBtn = document.createElement("button");
+  importBtn.textContent = "Import";
+  importBtn.classList.add("btn");
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.accept = ".json";
+  fileInput.style.display = "none";
+
+  importBtn.addEventListener("click", () => {
+    fileInput.click(); // Trigger file picker
+  });
+
+  fileInput.addEventListener("change", async () => {
+    if (!fileInput.files.length) return;
+    const file = fileInput.files[0];
+
+    try {
+      const text = await file.text();
+      const importFavs = JSON.parse(text);
+
+      if (!Array.isArray(importFavs)) {
+        alert("Invalid backup file format.");
+        return;
+      }
+
+      const { savedFavs = [] } = await browser.storage.local.get("savedFavs");
+
+      // Append imported favorites, but not duplicate URLs
+      const mergedFavs = [...savedFavs];
+      let imported = 0;
+      importFavs.forEach(link => {
+        if (!mergedFavs.some(other => other.url === link.url)) {
+          mergedFavs.push(link);
+          imported++;
+        }
+      });
+
+      await browser.storage.local.set({ savedFavs: mergedFavs });
+
+      showFavsModal();
+
+      console.log(`Imported ${imported} out of ${importFavs.length} favs. Total favs: ${mergedFavs.length}`);
+    } catch (err) {
+      console.error("Import failed:", err);
+      alert("Failed to import backup file.");
+    }
+
+    fileInput.value = "";
+  });
+
+  container.appendChild(importBtn);
+  container.appendChild(fileInput);
 }
 
 // Run setup
