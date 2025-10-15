@@ -13,7 +13,7 @@
   margin-bottom: 10px;
 }
 
-.modal-box {
+#favs-list-modal > div {
   max-width: 40em;
 }
 

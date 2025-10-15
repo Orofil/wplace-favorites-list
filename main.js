@@ -194,9 +194,9 @@ async function initFavsModal() {
   modal.id = "favs-list-modal";
   modal.classList.add("modal");
   
-  const modalBox = document.createElement("div");
-  modalBox.classList.add("modal-box");
-  modalBox.classList.add("max-h-11/12");
+  const modalDiv = document.createElement("div");
+  modalDiv.classList.add("modal-box");
+  modalDiv.classList.add("max-h-11/12");
   
   const closeForm = document.createElement("form");
   closeForm.method = "dialog";
@@ -235,11 +235,11 @@ async function initFavsModal() {
   const list = document.createElement("ul");
   list.id = "favs-list";
   
-  modalBox.appendChild(closeForm);
-  modalBox.appendChild(headerContainer);
-  modalBox.appendChild(list);
+  modalDiv.appendChild(closeForm);
+  modalDiv.appendChild(headerContainer);
+  modalDiv.appendChild(list);
   
-  modal.appendChild(modalBox);
+  modal.appendChild(modalDiv);
   modal.appendChild(backdrop);
 
   document.body.appendChild(modal);
