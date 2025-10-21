@@ -176,6 +176,7 @@ function createListButton() {
   btn.classList.add("btn-square");
   btn.classList.add("relative");
   btn.classList.add("shadow-md");
+  btn.title = "Favorites";
   container.appendChild(btn);
 }
 
@@ -198,7 +199,11 @@ async function initFavsModal() {
   modalDiv.classList.add("modal-box");
   modalDiv.classList.add("max-h-11/12");
   
+  const stickyHeader = document.createElement("div");
+  stickyHeader.classList.add("modal-sticky-header");
+
   const closeForm = document.createElement("form");
+  closeForm.classList.add("close-form");
   closeForm.method = "dialog";
   
   const close = createButton("✕", () => {});
@@ -231,12 +236,14 @@ async function initFavsModal() {
   createImportButton(backupButtonsContainer);
 
   headerContainer.appendChild(backupButtonsContainer);
+
+  stickyHeader.appendChild(closeForm);
+  stickyHeader.appendChild(headerContainer);
   
   const list = document.createElement("ul");
   list.id = "favs-list";
   
-  modalDiv.appendChild(closeForm);
-  modalDiv.appendChild(headerContainer);
+  modalDiv.appendChild(stickyHeader);
   modalDiv.appendChild(list);
   
   modal.appendChild(modalDiv);

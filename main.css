@@ -17,17 +17,26 @@
   max-width: 40em;
 }
 
+.modal-sticky-header {
+  position: sticky;
+  top: -1.5em; /* Hacky way to cover the top with the background */
+  z-index: 2;
+  background: #fff;
+}
+
+.close-form {
+  position: absolute;
+  top: 0;
+  right: -1.5rem;
+}
+
 .modal-header {
   border-bottom: 1px solid var(--accent-color);
   padding-bottom: 10px;
   margin-bottom: 10px;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  background: #fff;
   display: flex;
-  flex-direction: row;
   justify-content: space-between;
+  align-items: center;
 }
 
 .modal-header .backup-buttons {
