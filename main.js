@@ -32,7 +32,7 @@ function createButton(label, onClick) {
 // Find share button and add onClick
 function waitForShareButton() {
   const container = document.querySelector(
-    "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pb-2.pt-3.sm\\:pb-3");
+    "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pt-1\\.5.pb-2");
   if (!container) return;
 
   const shareBtn = [...container.querySelectorAll("button")].find((btn) =>
