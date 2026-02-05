@@ -14,3 +14,5 @@ This browser extension adds a new favorites system to Wplace, allowing saving mo
 5. Click the *Save to Favorites* button.
 
 You can then find the saved place from the star symbol at the right edge of the screen.
+
+**If the *Save to favorites* section doesn't appear, or if the save button is disabled, try closing and reopening the *Share* menu.**
