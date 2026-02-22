@@ -32,7 +32,7 @@ function createButton(label, onClick) {
 // Find share button and add onClick
 function waitForShareButton() {
   const container = document.querySelector(
-    "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pt-1\\.5.pb-2");
+    "div.hide-scrollbar.flex.max-w-full.gap-1\\.5.overflow-x-auto.px-3.pt-1.pb-2");
   if (!container) return;
 
   const shareBtn = [...container.querySelectorAll("button")].find((btn) =>
@@ -125,14 +125,13 @@ async function createSaveButtonInModal() {
 
       const [coordLat, coordLon] = getCoordinates(urlText);
 
-      const infoContainer = document.querySelector(
-        "div.rounded-t-box.bg-base-100.border-base-300.sm\\:rounded-b-box.w-full.border-t.pt-2.sm\\:mb-3.sm\\:shadow-xl");
-      const pixelSpan = infoContainer.querySelector("span.whitespace-nowrap");
+      const infoContainer = document.querySelector("div.rounded-t-box");
+      const pixelSpan = infoContainer.querySelector("span.text-base-content\\/70.shrink-0.text-xs");
       const pixelText = pixelSpan.innerText;
-      const pixelX = pixelText.substring(pixelText.indexOf(":")+2, pixelText.indexOf(","));
+      const pixelX = pixelText.substring(0, pixelText.indexOf(","));
       const pixelY = pixelText.substring(pixelText.indexOf(",")+2);
 
-      const areaContainer = infoContainer.querySelector("button.btn.btn-xs.flex.gap-1.py-3.text-sm.max-sm\\:max-w-32");
+      const areaContainer = infoContainer.querySelector("button.btn.btn-xs.flex");
       const [areaCountry, areaName, areaNumber] = Array.from(areaContainer.querySelectorAll("span"))
         .map(span => span.textContent.trim());
 
